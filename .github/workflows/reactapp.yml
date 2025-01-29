@@ -13,7 +13,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: List repository contents
-        run: ls -la  # List the contents of the repository to verify where `package.json` is located
+        run: ls -la  # List contents of the repository to confirm where the folders are
+
+      - name: List contents of reactapp directory
+        run: ls -la reactapp  # List contents inside the reactapp directory to verify where package.json and public are
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -22,14 +25,13 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          # If package.json is in 'reactapp', navigate to that folder; otherwise, install in the root
           if [ -f package.json ]; then
             npm install
           elif [ -f reactapp/package.json ]; then
             cd reactapp
             npm install
           else
-            echo "package.json not found in the repository"
+            echo "package.json not found"
             exit 1
           fi
 
@@ -40,7 +42,6 @@ jobs:
 
       - name: Build React App
         run: |
-          # Build step, depending on where package.json is located
           if [ -f package.json ]; then
             npm run build
           elif [ -f reactapp/package.json ]; then
@@ -68,4 +69,4 @@ jobs:
           app-name: "calc1-app-webapp"
           slot-name: "production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: './reactapp/build'  # Adjust this if needed based on the folder structure
+          package: './reactapp/build'  # Adjust this path if necessary
