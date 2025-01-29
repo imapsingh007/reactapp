@@ -18,6 +18,9 @@ jobs:
       - name: List contents of reactapp directory
         run: ls -la reactapp  # List contents of the reactapp folder
 
+      - name: List contents of reactapp/reactapp (if it exists)
+        run: ls -la reactapp/reactapp || echo "No nested reactapp directory"  # Check for an extra layer
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -29,6 +32,9 @@ jobs:
             npm install
           elif [ -f reactapp/package.json ]; then
             cd reactapp
+            npm install
+          elif [ -f reactapp/reactapp/package.json ]; then
+            cd reactapp/reactapp
             npm install
           else
             echo "package.json not found"
@@ -47,6 +53,9 @@ jobs:
           elif [ -f reactapp/package.json ]; then
             cd reactapp
             npm run build
+          elif [ -f reactapp/reactapp/package.json ]; then
+            cd reactapp/reactapp
+            npm run build
           else
             echo "package.json not found"
             exit 1
@@ -58,6 +67,8 @@ jobs:
             ls -la ./build
           elif [ -d reactapp/build ]; then
             ls -la ./reactapp/build
+          elif [ -d reactapp/reactapp/build ]; then
+            ls -la ./reactapp/reactapp/build
           else
             echo "Build folder not found"
             exit 1
