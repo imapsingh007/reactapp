@@ -41,16 +41,9 @@ jobs:
             exit 1
           fi
 
-      - name: List npm version and path
-        run: |
-          npm -v
-          which npm
-
-      - name: List all contents of the repository
-        run: ls -R  # List all files recursively to find index.html or any relevant files
-
       - name: Check for index.html in all directories
         run: |
+          echo "Searching for index.html..."
           find . -name 'index.html'  # Search for index.html anywhere in the repo
 
       - name: Build React App
