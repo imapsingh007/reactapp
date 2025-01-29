@@ -15,19 +15,26 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: '16'  # Adjusted Node version to 16 for compatibility
 
       - name: Install Dependencies
         run: npm install
-       
+
+      - name: List npm version and path
+        run: |
+          npm -v
+          which npm
 
       - name: Build React App
         run: npm run build
-        
+
+      - name: List build folder contents
+        run: ls -la ./build  # This step will help verify that the build folder exists and contains the expected files
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "calc1-app-webapp"
-          slot-name: "production"
+          app-name: "calc1-app-webapp"  # Ensure this is the correct Azure Web App name
+          slot-name: "production"       # Adjust if you're using a different slot
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: './build'
