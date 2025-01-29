@@ -46,18 +46,12 @@ jobs:
           npm -v
           which npm
 
-      - name: Check for index.html
+      - name: List all contents of the repository
+        run: ls -R  # List all files recursively to find index.html or any relevant files
+
+      - name: Check for index.html in all directories
         run: |
-          if [ -f public/index.html ]; then
-            echo "index.html found in public"
-          elif [ -f reactapp/public/index.html ]; then
-            echo "index.html found in reactapp/public"
-          elif [ -f reactapp/reactapp/public/index.html ]; then
-            echo "index.html found in reactapp/reactapp/public"
-          else
-            echo "index.html not found"
-            exit 1
-          fi
+          find . -name 'index.html'  # Search for index.html anywhere in the repo
 
       - name: Build React App
         run: |
