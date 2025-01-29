@@ -12,14 +12,21 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # List contents of the root directory
       - name: List repository contents (root)
-        run: ls -la  # List contents of the root repository
+        run: ls -la
 
+      # List contents of reactapp directory
       - name: List contents of reactapp directory
-        run: ls -la reactapp  # List contents of the reactapp folder
+        run: ls -la reactapp
 
-      - name: List contents of reactapp/reactapp (if it exists)
-        run: ls -la reactapp/reactapp || echo "No nested reactapp directory"  # Check for an extra layer
+      # List contents of reactapp/reactapp (if it exists)
+      - name: List contents of reactapp/reactapp (if exists)
+        run: ls -la reactapp/reactapp || echo "No nested reactapp directory"
+
+      # Check for the location of index.html
+      - name: Check for index.html in the repo
+        run: find . -name 'index.html'
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -28,6 +35,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          # Check if package.json exists in the root or reactapp folder
           if [ -f package.json ]; then
             npm install
           elif [ -f reactapp/package.json ]; then
@@ -40,14 +48,10 @@ jobs:
             echo "package.json not found"
             exit 1
           fi
-
-      - name: Check for index.html in all directories
-        run: |
-          echo "Searching for index.html..."
-          find . -name 'index.html'  # Search for index.html anywhere in the repo
 
       - name: Build React App
         run: |
+          # Check where to run npm build based on package.json location
           if [ -f package.json ]; then
             npm run build
           elif [ -f reactapp/package.json ]; then
@@ -61,6 +65,7 @@ jobs:
             exit 1
           fi
 
+      # List build folder contents for debugging
       - name: List build folder contents
         run: |
           if [ -d build ]; then
@@ -80,4 +85,4 @@ jobs:
           app-name: "calc1-app-webapp"
           slot-name: "production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: './reactapp/build'  # Adjust this path if necessary
+          package: './reactapp/build'  # Adjust if necessary
