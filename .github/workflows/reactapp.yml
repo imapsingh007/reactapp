@@ -12,16 +12,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Navigate to correct directory
-        run: cd reactapp  # Ensure this step navigates to the directory where package.json is located, e.g., 'reactapp'
+      - name: List repository contents
+        run: ls -la  # List the contents of the repository to verify where `package.json` is located
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Adjusted Node version to 16 for compatibility
+          node-version: '16'
 
       - name: Install Dependencies
-        run: npm install
+        run: |
+          # If package.json is in 'reactapp', navigate to that folder; otherwise, install in the root
+          if [ -f package.json ]; then
+            npm install
+          elif [ -f reactapp/package.json ]; then
+            cd reactapp
+            npm install
+          else
+            echo "package.json not found in the repository"
+            exit 1
+          fi
 
       - name: List npm version and path
         run: |
@@ -29,15 +39,33 @@ jobs:
           which npm
 
       - name: Build React App
-        run: npm run build
+        run: |
+          # Build step, depending on where package.json is located
+          if [ -f package.json ]; then
+            npm run build
+          elif [ -f reactapp/package.json ]; then
+            cd reactapp
+            npm run build
+          else
+            echo "package.json not found"
+            exit 1
+          fi
 
       - name: List build folder contents
-        run: ls -la ./build  # This step will help verify that the build folder exists and contains the expected files
+        run: |
+          if [ -d build ]; then
+            ls -la ./build
+          elif [ -d reactapp/build ]; then
+            ls -la ./reactapp/build
+          else
+            echo "Build folder not found"
+            exit 1
+          fi
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "calc1-app-webapp"  # Ensure this is the correct Azure Web App name
-          slot-name: "production"       # Adjust if you're using a different slot
+          app-name: "calc1-app-webapp"
+          slot-name: "production"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          package: './build'
+          package: './reactapp/build'  # Adjust this if needed based on the folder structure
